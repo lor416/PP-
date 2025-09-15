@@ -5,10 +5,11 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) {
         try {
-            // Ввод матрицы
-            //int[][] matrix = MatrixOperations.inputMatrix();
-            int[][] matrix = MatrixOperations.inputMatrixFromFile("input.txt");
+            // Ввод матрицы (из файла)
 
+            int[][] matrix;
+            matrix = MatrixOperations.inputMatrixFromFile("input.txt");
+            System.out.println("Матрица загружена из файла ");
 
             // Вывод исходной матрицы
             System.out.println("\nИсходная матрица:");
@@ -33,7 +34,7 @@ public class Main {
 
 
         } catch (IOException e) {
-            System.out.println("Ошибка чтения с клавиатуры: " + e.getMessage());
+            System.out.println("Ошибка чтения: " + e.getMessage());
         } catch (NumberFormatException e) {
             System.out.println("Ошибка: введено не число: " + e.getMessage());
         } catch (Exception e) {

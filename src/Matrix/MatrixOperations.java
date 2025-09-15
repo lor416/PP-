@@ -3,6 +3,8 @@ package Matrix;
 import java.util.Arrays;
 import java.io.*;
 import java.util.Scanner;
+import java.util.*;
+
 
 public class MatrixOperations {
 
@@ -37,28 +39,40 @@ public class MatrixOperations {
     }
     // Метод для ввода матрицы из файла
     public static int[][] inputMatrixFromFile(String filename) throws IOException {
-        File file = new File(filename);
-        Scanner scanner = new Scanner(file);
+        try (Scanner scanner = new Scanner(new File(filename))) {
+            List<int[]> rows = new ArrayList<>();
 
-        // Читаем размерность матрицы
-        int n = scanner.nextInt();
-        int m = scanner.nextInt();
+            // Читаем все строки файла
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine().trim();
+                if (line.isEmpty()) continue; // Пропускаем пустые строки
 
-        int[][] matrix = new int[n][m];
+                // Разбиваем строку на числа
+                String[] numbers = line.split("\\s+");
+                int[] row = new int[numbers.length];
 
-        // Читаем элементы матрицы
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (scanner.hasNextInt()) {
-                    matrix[i][j] = scanner.nextInt();
-                } else {
-                    throw new IOException("Недостаточно данных в файле");
+                for (int i = 0; i < numbers.length; i++) {
+                    row[i] = Integer.parseInt(numbers[i]);
+                }
+
+                rows.add(row);
+            }
+
+            if (rows.isEmpty()) {
+                throw new IOException("Файл пуст");
+            }
+
+            // Проверяем, что все строки одинаковой длины
+            int columns = rows.get(0).length;
+            for (int i = 1; i < rows.size(); i++) {
+                if (rows.get(i).length != columns) {
+                    throw new IOException("Строки матрицы имеют разную длину");
                 }
             }
-        }
 
-        scanner.close();
-        return matrix;
+            // Преобразуем в двумерный массив
+            return rows.toArray(new int[0][]);
+        }
     }
 
     // Метод для вывода матрицы
