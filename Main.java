@@ -17,6 +17,7 @@ public class Main {
 
             int choice = scanner.nextInt();
 
+
             if (choice == 1 || choice == 2 || choice == 0) {
                 Book.writeStudentsToFile(allBooks, "output.txt", choice);
                 System.out.println("Данные успешно записаны в файл output.txt");

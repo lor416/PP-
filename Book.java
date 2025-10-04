@@ -12,13 +12,13 @@ public class Book {
         private int numSession;
         private String subject;
         private int mark;
-        //private String type;
+        private String type;
 
-        public WriteMark(int numSession, String subject, int mark){
+        public WriteMark(int numSession, String subject, int mark, String type){
             this.numSession = numSession;
             this.subject = subject;
             this.mark = mark;
-            //this.type = type;
+            this.type = type;
         }
         public int getNumSession(){
             return numSession;
@@ -29,9 +29,9 @@ public class Book {
         public int getMark() {
             return mark;
         }
-        /*public String getType(){
+        public String getType(){
             return type;
-        }*/
+        }
         @Override
         public String toString(){
             return name1 + ' ' + name2 + ' ' + name3 + "ну и тд дописать";
@@ -51,25 +51,30 @@ public class Book {
         this.group = group;
         this.markList = new ArrayList<>();
     }
-    public void addList(int numSession, String subject, int mark){
-        WriteMark list = new WriteMark(numSession, subject, mark);
+    public void addList(int numSession, String subject, int mark, String type){
+        WriteMark list = new WriteMark(numSession, subject, mark, type);
         markList.add(list);
     }
     public int isGood(){
         if(markList.isEmpty())
             return 0;
+
         boolean hasExcellent = true;
+
         for(WriteMark mark : markList){
-            if(mark.mark < 4) {
+            if (mark.mark != -1 && mark.mark < 4) {
                 return 2;  // 2 -- двоечник
             }
-            if(mark.mark < 9) {
+            if ("незачет".equals(mark.type)) {
+                return 2;  // 2 -- двоечник
+            }
+            if (mark.mark != -1 && mark.mark < 9) {
                 hasExcellent = false;
-                break;
             }
         }
+
         if (hasExcellent)
-            return 1; // 1 -- отличник (все оценки >= 9)
+            return 1; // 1 -- отличник (все ЧИСЛОВЫЕ оценки >= 9)
         else
             return 0; // 0 -- обычный студент
     }
@@ -79,25 +84,41 @@ public class Book {
         }
 
         int sum = 0;
+        int count = 0;
         for (WriteMark mark : markList) {
-            sum += mark.mark;
+            if(mark.mark!= -1){
+                sum += mark.mark;
+                count ++;
+            }
+        }
+        if (count == 0) {
+            return -1; // Если все оценки - зачеты
         }
 
-        return (double) sum / markList.size();
+        return (double) sum / count;
     }
     public void calculateAndWriteSessionAverages(PrintWriter writer) {
         for (int session = 1; session <= 9; session++) {
+            boolean hasSessionData = false;
             int sum = 0;
             int count = 0;
+
             for (WriteMark mark : markList) {
                 if (mark.getNumSession() == session) {
-                    sum += mark.getMark();
-                    count++;
+                    hasSessionData = true;
+                    if (mark.getMark() != -1) {
+                        sum += mark.getMark();
+                        count++;
+                    }
                 }
             }
-            if (count > 0) {
-                double average = (double) sum / count;
-                writer.printf("Средний балл за сессию %d: %.2f\n", session, average);
+            if (hasSessionData) {
+                if (count > 0) {
+                    double average = (double) sum / count;
+                    writer.printf("Средний балл за сессию %d: %.2f\n", session, average);
+                } else {
+                    writer.printf("Средний балл за сессию %d: не может быть подсчитан (только зачеты)\n", session);
+                }
             }
         }
     }
@@ -113,7 +134,7 @@ public class Book {
             Book nowBook = null;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
-                if (line.isEmpty()) continue; // Пропуск пустых строк
+                if (line.isEmpty()) continue;
 
                 if (line.startsWith("Студент:")) {
                     String[] parts = line.split(",");
@@ -125,16 +146,26 @@ public class Book {
                     int group = Integer.parseInt(parts[2].replace("группа", "").trim());
 
                     nowBook = new Book(name1, curse, group);
-                    allBooks.add(nowBook); // Добавление в коллекцию
+                    allBooks.add(nowBook);
 
                 } else if (nowBook != null && line.contains("сессия")) {
                     String[] parts = line.split(",");
                     int numSession = Integer.parseInt(parts[0].replace("сессия", "").trim());
                     String subject = parts[1].trim();
-                    int mark = Integer.parseInt(parts[2].trim());
-                    //String типСдачи = части[3].trim();
+                    //int mark = Integer.parseInt(parts[2].trim());
+                    String word = parts[2].trim();
+                    if(word.length() > 3) {
+                        String type = word;
+                        int mark = -1;
+                        nowBook.addList(numSession, subject, mark, type);
+                    }
+                    else{
+                        int mark = Integer.parseInt(word);
+                        String type = "";
+                        nowBook.addList(numSession, subject, mark, type);
+                    }
 
-                    nowBook.addList(numSession, subject, mark);
+                    //nowBook.addList(numSession, subject, mark, type);
                 }
 
             }
@@ -143,6 +174,12 @@ public class Book {
         return allBooks;
     }
 
+    public static class AverageMarkComparator implements Comparator<Book> {
+        @Override
+        public int compare(Book book1, Book book2) {
+            return Double.compare(book1.calculateAverageMark(), book2.calculateAverageMark()); // по возрастанию
+        }
+    }
     public static void writeStudentsToFile(List<Book> allBooks, String outputFile, int studentType) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(outputFile))) {
             if (studentType == 1) {
@@ -152,16 +189,32 @@ public class Book {
             } else if (studentType == 0)
                 writer.println("ВСЕ СТУДЕНТЫ:\n");
 
-            for (Book book : allBooks) {
+            List<Book> sortedBooks = new ArrayList<>(allBooks);
+            sortedBooks.sort(new AverageMarkComparator());
+            for (Book book : sortedBooks) {
                 if (studentType == 0 || book.isGood() == studentType) {
                     writer.println("Студент: " + book.name1 + ", " + book.curse + " курс, группа " + book.group);
                     writer.println("Оценки:");
                     for (WriteMark mark : book.markList) {
-                        writer.println("  - Сессия " + mark.getNumSession() + ", " +
-                                mark.getSubject() + ", оценка: " + mark.getMark());
+                        if(mark.getMark() == -1){
+                            writer.println("  - Сессия " + mark.getNumSession() + ", " +
+                                    mark.getSubject() + ", " + mark.getType());
+                        }
+                        else{
+                            writer.println("  - Сессия " + mark.getNumSession() + ", " +
+                                    mark.getSubject() + ", " + mark.getMark());
+                        }
+
+
                     }
-                    writer.println("Средний балл: "+ book.calculateAverageMark());
+                    double average =  book.calculateAverageMark();
+                    if(average != -1)
+                        writer.println("Средний балл: "+ average);
+                    else
+                        writer.println("Cредний балл не может быть подсчитан");
+
                     book.calculateAndWriteSessionAverages(writer);
+                    writer.println("\n");
 
                 }
             }
