@@ -29,18 +29,10 @@ public class Book {
         public int getMark() {
             return mark;
         }
-        public String getType(){
+        public String getType() {
             return type;
         }
-        @Override
-        public String toString(){
-            return name1 + ' ' + name2 + ' ' + name3 + "ну и тд дописать";
 
-        }
-        public String toFileString(){
-            return name1 + ' ' + name2 + ' ' + name3 + "ну и тд дописать файл";
-
-        }
 
 
 
@@ -59,24 +51,22 @@ public class Book {
         if(markList.isEmpty())
             return 0;
 
-        boolean hasExcellent = true;
-
         for(WriteMark mark : markList){
-            if (mark.mark != -1 && mark.mark < 4) {
-                return 2;  // 2 -- двоечник
+            if(mark.mark == -1){
+                if ("незачет".equals(mark.type)) {
+                    return 2;  // 2 -- двоечник
+                }
             }
-            if ("незачет".equals(mark.type)) {
-                return 2;  // 2 -- двоечник
-            }
-            if (mark.mark != -1 && mark.mark < 9) {
-                hasExcellent = false;
+            else {
+                if (mark.mark < 4) {
+                    return 2;  // 2 -- двоечник
+                }
+                if (mark.mark < 9) {
+                    return 0; // 0 -- не отличник, не двоечник
+                }
             }
         }
-
-        if (hasExcellent)
-            return 1; // 1 -- отличник (все ЧИСЛОВЫЕ оценки >= 9)
-        else
-            return 0; // 0 -- обычный студент
+        return 1; // 1 -- отличник (все оценки >= 9)
     }
     public double calculateAverageMark() {
         if (markList.isEmpty()) {
@@ -132,8 +122,10 @@ public class Book {
         try(BufferedReader reader = new BufferedReader(new FileReader(inputFile))) {
             String line;
             Book nowBook = null;
+            int lineNum = 0;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
+                lineNum++;
                 if (line.isEmpty()) continue;
 
                 if (line.startsWith("Студент:")) {
@@ -144,6 +136,15 @@ public class Book {
                     String name3 = FIO[2];
                     int curse = Integer.parseInt(parts[1].replace("курс", "").trim());
                     int group = Integer.parseInt(parts[2].replace("группа", "").trim());
+                    if (curse < 1 || curse > 10) {
+                        System.err.println("Ошибка в строке " + lineNum + ": некорректный курс: " + curse);
+                        continue;
+                    }
+                    if (group < 1) {
+                        System.err.println("Ошибка в строке " + lineNum + ": некорректная группа: " + group);
+                        continue;
+                    }
+
 
                     nowBook = new Book(name1, curse, group);
                     allBooks.add(nowBook);
@@ -151,16 +152,32 @@ public class Book {
                 } else if (nowBook != null && line.contains("сессия")) {
                     String[] parts = line.split(",");
                     int numSession = Integer.parseInt(parts[0].replace("сессия", "").trim());
+                    if (numSession < 1 || numSession > 20) {
+                        System.err.println("Ошибка в строке " + lineNum + ": некорректный номер сессии: " + numSession);
+                        continue;
+                    }
                     String subject = parts[1].trim();
+                    if (subject.isEmpty()) {
+                        System.err.println("Ошибка в строке " + lineNum + ": пустое название предмета");
+                        continue;
+                    }
                     //int mark = Integer.parseInt(parts[2].trim());
                     String word = parts[2].trim();
                     if(word.length() > 3) {
                         String type = word;
+                        if (!type.equals("зачет") && !type.equals("незачет")) {
+                            System.err.println("Ошибка в строке " + lineNum + ": некорректный тип зачета: " + type);
+                            continue;
+                        }
                         int mark = -1;
                         nowBook.addList(numSession, subject, mark, type);
                     }
                     else{
                         int mark = Integer.parseInt(word);
+                        if (mark < 0 || mark > 10) {
+                            System.err.println("Ошибка в строке " + lineNum + ": некорректная оценка: " + mark);
+                            continue;
+                        }
                         String type = "";
                         nowBook.addList(numSession, subject, mark, type);
                     }
@@ -194,6 +211,7 @@ public class Book {
             for (Book book : sortedBooks) {
                 if (studentType == 0 || book.isGood() == studentType) {
                     writer.println("Студент: " + book.name1 + ", " + book.curse + " курс, группа " + book.group);
+                    //writer.println(book);
                     writer.println("Оценки:");
                     for (WriteMark mark : book.markList) {
                         if(mark.getMark() == -1){
