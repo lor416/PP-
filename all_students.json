@@ -1,0 +1,116 @@
+[ {
+  "name1" : "Иванов",
+  "name2" : null,
+  "name3" : null,
+  "group" : 101,
+  "markList" : [ {
+    "numSession" : 1,
+    "subject" : "Математика",
+    "mark" : 9,
+    "type" : ""
+  }, {
+    "numSession" : 1,
+    "subject" : "Физика",
+    "mark" : 10,
+    "type" : ""
+  }, {
+    "numSession" : 3,
+    "subject" : "История",
+    "mark" : -1,
+    "type" : "зачет"
+  } ],
+  "course" : 1
+}, {
+  "name1" : "Сидоров",
+  "name2" : null,
+  "name3" : null,
+  "group" : 100,
+  "markList" : [ {
+    "numSession" : 1,
+    "subject" : "Математика",
+    "mark" : 3,
+    "type" : ""
+  }, {
+    "numSession" : 1,
+    "subject" : "Физика",
+    "mark" : 4,
+    "type" : ""
+  }, {
+    "numSession" : 2,
+    "subject" : "Математический анализ",
+    "mark" : 10,
+    "type" : ""
+  } ],
+  "course" : 2
+}, {
+  "name1" : "Петрова",
+  "name2" : null,
+  "name3" : null,
+  "group" : 201,
+  "markList" : [ {
+    "numSession" : 2,
+    "subject" : "Программирование",
+    "mark" : 8,
+    "type" : ""
+  }, {
+    "numSession" : 2,
+    "subject" : "Базы данных",
+    "mark" : -1,
+    "type" : "незачет"
+  } ],
+  "course" : 3
+}, {
+  "name1" : "Фамилия",
+  "name2" : null,
+  "name3" : null,
+  "group" : 404,
+  "markList" : [ {
+    "numSession" : 2,
+    "subject" : "Программирование",
+    "mark" : 9,
+    "type" : ""
+  }, {
+    "numSession" : 2,
+    "subject" : "Базы данных",
+    "mark" : 9,
+    "type" : ""
+  }, {
+    "numSession" : 2,
+    "subject" : "ОС",
+    "mark" : 9,
+    "type" : ""
+  } ],
+  "course" : 5
+}, {
+  "name1" : "Фамилия1",
+  "name2" : null,
+  "name3" : null,
+  "group" : 712,
+  "markList" : [ {
+    "numSession" : 1,
+    "subject" : "Программирование1",
+    "mark" : -1,
+    "type" : "незачет"
+  }, {
+    "numSession" : 2,
+    "subject" : "Базы данных1",
+    "mark" : -1,
+    "type" : "незачет"
+  }, {
+    "numSession" : 3,
+    "subject" : "предмет3",
+    "mark" : 10,
+    "type" : ""
+  }, {
+    "numSession" : 4,
+    "subject" : "предмет4",
+    "mark" : 9,
+    "type" : ""
+  }, {
+    "numSession" : 5,
+    "subject" : "предмет5",
+    "mark" : 8,
+    "type" : ""
+  } ],
+  "course" : 9
+} ]
