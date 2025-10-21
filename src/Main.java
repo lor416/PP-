@@ -28,6 +28,8 @@ public class Main {
             } else {
                 System.out.println("Неверный выбор, допустимые значения: 0, 1 или 2");
             }
+            System.out.println("проверка для гит");
+
 
 
         } catch (IOException e) {
