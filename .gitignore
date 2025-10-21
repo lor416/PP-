@@ -1,29 +1,25 @@
-### IntelliJ IDEA ###
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
+# Файлы сборки Java
+target/
+build/
+*.class
 
-### Eclipse ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
+# Файлы IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
-.vscode/
-
-### Mac OS ###
+# Системные файлы
 .DS_Store
+Thumbs.db
+desktop.ini
+
+# Файлы данных
+*.json
+
+# Логи
+*.log
+
+# Временные файлы
+*.tmp
+*.temp
